@@ -1,46 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
 import { FaShoppingCart } from "react-icons/fa";
-
-const popularProducts = [
-  {
-    name: "Red Carrot",
-    price: 125,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Cauliflower",
-    price: 100,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Cilantro",
-    price: 200,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Green Capsicum (500gm)",
-    price: 300,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Yellow Bell Pepper",
-    price: 250,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Purple Cabbage",
-    price: 250,
-    image: "https://via.placeholder.com/300x200",
-  },
-  {
-    name: "Zucchini",
-    price: 400,
-    image: "https://via.placeholder.com/300x200",
-  },
-];
 
 function Products() {
   const [quantity, setQuantity] = useState(1);
@@ -49,9 +11,27 @@ function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(popularProducts);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const selectedBranch = sessionStorage.getItem("selectedBranch");
+  const userDetails = JSON.parse(sessionStorage.getItem("user"));
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:1337/api/products?filters[branch_name][$eq]=${selectedBranch}`
+        );
+        const data = await response.json();
+        setFilteredProducts(data.data || []); 
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedBranch]);
 
   const handleQuantityChange = (value) => {
     if (!isNaN(value) && value > 0) setQuantity(value);
@@ -59,9 +39,53 @@ function Products() {
 
   const handleBuyNow = (product) => {
     setSelectedProduct(product);
-    setQuantity(1); // Reset quantity on new order
+    setQuantity(1); 
     setIsModalOpen(true);
   };
+
+  const handleCheckout = async (product) => {
+    console.log(product)
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
+    const cartData = {
+      data: {
+        product_name: product.product_name,
+        quantity: quantity,
+        total: product.product_price * quantity,
+        customer_name: userDetails.name,
+        date: formattedDate,
+        branch_name : product.branch_name,
+      }
+    };
+
+
+    const jsonString = JSON.stringify(cartData);
+
+    try {
+      const response = await fetch("http://localhost:1337/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: jsonString,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert("Product bought successfully!");
+      window.location.reload();
+      } else {
+        const errorData = await response.text(); 
+        alert("Failed to buy product!");
+        console.error(errorData);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while adding to cart!");
+    }
+  };
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -73,8 +97,8 @@ function Products() {
   };
 
   const applyPriceFilter = () => {
-    const filtered = popularProducts.filter((product) => {
-      const productPrice = product.price;
+    const filtered = filteredProducts.filter((product) => {
+      const productPrice = product.product_price;
       const isMinValid =
         minPrice === "" || productPrice >= parseFloat(minPrice);
       const isMaxValid =
@@ -88,11 +112,61 @@ function Products() {
   const shippingCost = 5.0;
   const totalAmount = totalPrice + shippingCost;
 
+  const handleCart = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+    console.log(userDetails.name)
+  };
+
+  const handleAddToCart = async () => {
+    const cartData = {
+      data: {
+        product_name: selectedProduct.product_name,
+        quantity: quantity,
+        price: selectedProduct.product_price,
+        user_name: userDetails.name, 
+        branch_name : selectedProduct.branch_name,
+      }
+    };
+
+    const jsonString = JSON.stringify(cartData);
+
+    try {
+      const response = await fetch("http://localhost:1337/api/carts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: jsonString,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert("Product added to cart!");
+        console.log(data);
+        window.location.reload();
+      } else {
+        const errorData = await response.text(); 
+        alert("Failed to add to cart!");
+        console.error(errorData);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while adding to cart!");
+    }
+  };
+
   return (
     <>
       <Header />
-      <div className="my-4 mt-8 mx-8 flex flex-col gap-4">
-        <div className="flex gap-4 justify-end">
+      <div className="my-4 mt-8 mx-8 flex flex-col gap-4 justify-between">
+        <div className="flex gap-4 justify-between">
+          <div>
+          <h1 className="text-bold text-xl mt-2">
+          {selectedBranch} Branch
+          </h1>
+          </div>
+          <div className="flex gap-4 justify-end">
           <input
             type="number"
             placeholder="Min Price"
@@ -115,6 +189,8 @@ function Products() {
           >
             Apply Filter
           </button>
+          </div>
+       
         </div>
       </div>
 
@@ -125,23 +201,25 @@ function Products() {
             className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md"
           >
             <img
-              src={product.image}
+              src={product.image || "https://via.placeholder.com/300x200"}
               alt={product.name}
               className="h-48 w-full object-cover"
             />
             <div className="flex flex-1 flex-col p-4">
               <h3 className="text-lg font-medium overflow-hidden text-ellipsis">
-                {product.name}
+                {product.product_name}
               </h3>
               <span className="text-xl font-bold mb-8">
-                ${product.price.toFixed(2)}
+                ${product.product_price}
               </span>
               <div className="flex flex-col mt-auto gap-2">
-                <button className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
+                <button className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                onClick={() => handleCart(product)}
+                >
                   Add to Cart
                 </button>
                 <button
-                  onClick={() => handleBuyNow(product)}
+                  onClick={() => handleCheckout(product)}
                   className="flex justify-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-400"
                 >
                   <FaShoppingCart className="h-5 w-5" />
@@ -169,13 +247,13 @@ function Products() {
               <div className="flex justify-between">
                 <span className="text-gray-700">Product:</span>
                 <span className="text-gray-800 font-semibold">
-                  {selectedProduct?.name}
+                  {selectedProduct?.product_name}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-700">Price:</span>
                 <span className="text-gray-800 font-semibold">
-                  ${selectedProduct?.price.toFixed(2)}
+                  ${selectedProduct?.product_price}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -204,22 +282,6 @@ function Products() {
                   </button>
                 </div>
               </div>
-              <div className="space-y-3 mt-6">
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Subtotal:</span>
-                  <span className="text-gray-800 font-semibold">
-                    ${totalPrice.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Shipping:</span>
-                  <span className="text-gray-800 font-semibold">$5.00</span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg text-gray-900">
-                  <span>Total:</span>
-                  <span>${totalAmount.toFixed(2)}</span>
-                </div>
-              </div>
               <div className="flex justify-between gap-4 mt-8">
                 <button
                   onClick={handleCloseModal}
@@ -228,7 +290,7 @@ function Products() {
                   Cancel
                 </button>
                 <button
-                  onClick={handlePlaceOrder}
+                  onClick={handleAddToCart}
                   className="w-full py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition"
                 >
                   Place Order
@@ -268,7 +330,7 @@ function Products() {
               <div className="flex justify-between">
                 <span className="text-gray-700">Price:</span>
                 <span className="text-gray-800 font-semibold">
-                  ${selectedProduct?.price.toFixed(2)}
+                  ${selectedProduct?.price}
                 </span>
               </div>
               <div className="flex justify-between">
