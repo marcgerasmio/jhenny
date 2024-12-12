@@ -7,96 +7,117 @@ import { FaShoppingCart } from "react-icons/fa";
 const popularProducts = [
   {
     name: "Red Carrot",
-    price: 2.99,
+    price: 125,
     image: "https://via.placeholder.com/300x200",
   },
   {
     name: "Cauliflower",
-    price: 3.49,
+    price: 100,
     image: "https://via.placeholder.com/300x200",
   },
   {
     name: "Cilantro",
-    price: 1.99,
+    price: 200,
     image: "https://via.placeholder.com/300x200",
   },
   {
     name: "Green Capsicum (500gm)",
-    price: 4.99,
+    price: 300,
     image: "https://via.placeholder.com/300x200",
   },
   {
-    name: "Green Capsicum (500gm)",
-    price: 4.99,
+    name: "Yellow Bell Pepper",
+    price: 250,
     image: "https://via.placeholder.com/300x200",
   },
   {
-    name: "Green Capsicum (500gm)",
-    price: 4.99,
+    name: "Purple Cabbage",
+    price: 250,
     image: "https://via.placeholder.com/300x200",
   },
   {
-    name: "Green Capsicum (500gm)",
-    price: 4.99,
+    name: "Zucchini",
+    price: 400,
     image: "https://via.placeholder.com/300x200",
   },
 ];
 
 function Products() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [quantity, setQuantity] = useState(1); // Keep track of quantity
+  const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Store selected product
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(popularProducts);
+
   const navigate = useNavigate();
 
-  // Calculate total price and shipping
-  const totalPrice = selectedProduct ? selectedProduct.price * quantity : 0;
-  const shipping = 5.0;
-  const totalAmount = totalPrice + shipping;
-
-  // Handle quantity change
   const handleQuantityChange = (value) => {
-    setQuantity(Math.max(1, value)); // Prevent quantity from going below 1
+    if (!isNaN(value) && value > 0) setQuantity(value);
   };
 
-  // Handle modal open and order details
   const handleBuyNow = (product) => {
     setSelectedProduct(product);
+    setQuantity(1); // Reset quantity on new order
     setIsModalOpen(true);
   };
 
-  // Handle close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setOrderSuccess(false);
   };
 
-  // Handle place order
   const handlePlaceOrder = () => {
     setOrderSuccess(true);
   };
 
-  // Filter products based on search query
-  const filteredProducts = popularProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const applyPriceFilter = () => {
+    const filtered = popularProducts.filter((product) => {
+      const productPrice = product.price;
+      const isMinValid =
+        minPrice === "" || productPrice >= parseFloat(minPrice);
+      const isMaxValid =
+        maxPrice === "" || productPrice <= parseFloat(maxPrice);
+      return isMinValid && isMaxValid;
+    });
+    setFilteredProducts(filtered);
+  };
+
+  const totalPrice = selectedProduct ? quantity * selectedProduct.price : 0;
+  const shippingCost = 5.0;
+  const totalAmount = totalPrice + shippingCost;
 
   return (
     <>
       <Header />
-      <div className="my-4 mx-8 flex justify-between">
-        <h1 className="text-bold text-xl mt-2">
-          (account sa gi tuplok nga category) (unsa ni nga brand)
-        </h1>
-        <input
-          type="text"
-          placeholder="Search for products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="p-3 w-1/4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
-        />
+      <div className="my-4 mt-8 mx-8 flex flex-col gap-4">
+        <div className="flex gap-4 justify-end">
+          <input
+            type="number"
+            placeholder="Min Price"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="p-3 w-1/5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+            min="0"
+          />
+          <input
+            type="number"
+            placeholder="Max Price"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="p-3 w-1/5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+            min="0"
+          />
+          <button
+            onClick={applyPriceFilter}
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          >
+            Apply Filter
+          </button>
+        </div>
       </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mx-5 py-3 mb-10">
         {filteredProducts.map((product, index) => (
           <div
@@ -131,9 +152,7 @@ function Products() {
           </div>
         ))}
       </div>
-      <Footer />
 
-      {/* Modal for Order Details */}
       {isModalOpen && !orderSuccess && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ease-in-out"
@@ -159,8 +178,6 @@ function Products() {
                   ${selectedProduct?.price.toFixed(2)}
                 </span>
               </div>
-
-              {/* Quantity Input */}
               <div className="flex justify-between items-center">
                 <label className="text-gray-700">Quantity:</label>
                 <div className="flex items-center gap-2">
@@ -174,11 +191,10 @@ function Products() {
                     type="number"
                     value={quantity}
                     onChange={(e) =>
-                      handleQuantityChange(parseInt(e.target.value))
+                      handleQuantityChange(parseInt(e.target.value, 10))
                     }
                     className="border border-gray-300 rounded-md w-16 text-center py-2"
                     min="1"
-                    max={selectedProduct?.stock}
                   />
                   <button
                     onClick={() => handleQuantityChange(quantity + 1)}
@@ -188,13 +204,11 @@ function Products() {
                   </button>
                 </div>
               </div>
-
-              {/* Order Summary */}
               <div className="space-y-3 mt-6">
                 <div className="flex justify-between">
                   <span className="text-gray-700">Subtotal:</span>
                   <span className="text-gray-800 font-semibold">
-                    ${totalPrice}
+                    ${totalPrice.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -203,10 +217,9 @@ function Products() {
                 </div>
                 <div className="flex justify-between font-semibold text-lg text-gray-900">
                   <span>Total:</span>
-                  <span>${totalAmount}</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
-
               <div className="flex justify-between gap-4 mt-8">
                 <button
                   onClick={handleCloseModal}
@@ -226,7 +239,6 @@ function Products() {
         </div>
       )}
 
-      {/* Success Modal */}
       {orderSuccess && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ease-in-out"
@@ -278,7 +290,6 @@ function Products() {
                 <span>${totalAmount.toFixed(2)}</span>
               </div>
             </div>
-
             <div className="mt-6 text-center">
               <button
                 onClick={handleCloseModal}
@@ -290,6 +301,7 @@ function Products() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
 }

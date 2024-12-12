@@ -4,9 +4,9 @@ export default function AdminDashboard() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-white shadow-md">
-        <div className="container mx-auto flex h-21 items-center justify-between px-4">
+        <div className="container mx-auto flex h-21 items-center justify-between px-4 p-2">
           <div className="flex items-center space-x-4">
-            <img src="logo.png" alt="Grocery Store" className="h-18 w-44" />
+            <img src="icon.png" alt="Grocery Store" />
           </div>
           <div className="flex items-center space-x-2">
             <div className="dropdown dropdown-end">

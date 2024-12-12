@@ -58,8 +58,8 @@ export default function Footer() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Contact Us</h3>
             <ul className="space-y-2">
-              <li>123 Grocery St, Food City</li>
-              <li>contact@grocerystore.com</li>
+              <li>123 street 45, Food City</li>
+              <li>contact@mrdiy.com</li>
               <li>+1 (123) 456-7890</li>
             </ul>
           </div>
@@ -78,8 +78,8 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t border-green-500 pt-8 text-center">
-          <p>&copy; 2023 Grocery Store. All rights reserved.</p>
+        <div className="mt-8 border-t border-orange-500 pt-8 text-center">
+          <p>&copy; 2024 Mr. DIY. All rights reserved.</p>
         </div>
       </div>
     </footer>

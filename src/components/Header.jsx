@@ -12,23 +12,17 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-white shadow-md">
-        <div className="container mx-auto flex h-21 items-center justify-between px-4">
-          {/* Logo */}
+        <div className="container mx-auto flex h-21 items-center justify-between px-4 p-2">
           <div className="flex items-center space-x-4">
-            <img src="logo.png" alt="Grocery Store" className="h-18 w-44" />
+            <img src="icon.png" alt="Grocery Store" />
           </div>
-
-          {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Shopping Cart Button */}
             <button
-              className="relative text-gray-700 hover:text-green-600"
+              className="relative text-gray-700 hover:text-orange-600"
               onClick={() => setIsCartOpen(true)}
             >
               <FiShoppingCart className="h-6 w-6" />
             </button>
-
-            {/* Profile Dropdown */}
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
@@ -49,7 +43,9 @@ export default function Header() {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
               >
                 <li onClick={() => setIsTransactionHistoryOpen(true)}>
-                  <button className="text-left w-full">Purchase History</button>
+                  <button className="text-left w-full">
+                    Transaction History
+                  </button>
                 </li>
                 <Link to="/">
                   <li>

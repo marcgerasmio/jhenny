@@ -14,7 +14,7 @@ function Register() {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
         <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Logo" className="w-40 h-24" />
+          <img src="icon.png" alt="Logo" />
         </div>
         <form>
           <div className="mb-2">
@@ -85,14 +85,14 @@ function Register() {
               type="submit"
               className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 focus:outline-none"
             >
-              Register
+              Sign up
             </button>
           </div>
           <div className="text-center mt-4">
             <p className="text-sm">
               Already have an account?{" "}
               <Link to="/" className="text-orange-500 hover:underline">
-                Login here
+                Sign in
               </Link>
             </p>
           </div>

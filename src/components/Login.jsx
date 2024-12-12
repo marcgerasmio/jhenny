@@ -11,7 +11,7 @@ function Login() {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
         <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Logo" className="w-40 h-24" />
+          <img src="icon.png" alt="Logo" />
         </div>
 
         <form>
@@ -65,14 +65,14 @@ function Login() {
               type="submit"
               className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 focus:outline-none"
             >
-              Login
+              Sign in
             </button>
           </div>
           <div className="text-center">
             <p className="text-sm">
               Don't have an account?{" "}
               <Link to="/register" className="text-orange-500 hover:underline">
-                Create an account
+                Sign up
               </Link>
             </p>
           </div>

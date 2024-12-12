@@ -46,10 +46,10 @@ export default function PurchaseHistory({ isOpen, onClose }) {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-md w-3/4 max-w-4xl">
         <div className="flex justify-between mb-4">
-          <h2 className="text-2xl font-bold text-green-700">
+          <h2 className="text-2xl font-bold text-orange-600">
             Transaction History
           </h2>
-          <button onClick={onClose} className="text-blue-500 hover:underline">
+          <button onClick={onClose} className="text-orange-600 hover:underline">
             <FaArrowLeft className="inline mr-1" /> Close
           </button>
         </div>

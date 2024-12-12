@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import Header from "./Header";
-import CategorySection from "./CategorySection";
-import ProductCard from "./ProductCard";
+import BranchSection from "./BranchSection";
 import Footer from "./Footer";
 
 const bannerItems = [
@@ -28,21 +28,35 @@ const bannerItems = [
 ];
 
 export default function Dashboard() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % bannerItems.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prevSlide) =>
+      prevSlide === 0 ? bannerItems.length - 1 : prevSlide - 1
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="px-5">
         <div className="container mx-auto px-4 py-7">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {bannerItems.map((item) => (
+          <div className="carousel w-full">
+            {bannerItems.map((item, index) => (
               <div
                 key={item.id}
-                className="relative h-[200px] overflow-hidden rounded-lg md:h-[300px]"
+                className={`carousel-item relative w-full ${
+                  index === currentSlide ? "block" : "hidden"
+                }`}
               >
                 <img
                   src={item.image}
                   alt={item.alt}
-                  className="h-full w-full object-cover"
+                  className="h-[200px] w-full object-cover rounded-lg md:h-[300px]"
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-40 p-4 text-center text-white">
                   <h2 className="mb-2 text-2xl font-bold md:text-3xl">
@@ -53,40 +67,55 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-        </div>
-        <CategorySection />
-        <section className="py-8 mb-10">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-6 text-2xl font-bold text-green-600">
-              Our Popular Products
-            </h2>
-            <ProductCard />
+          <div className="flex justify-center py-4">
+            <button className="btn btn-circle" onClick={prevSlide}>
+              ❮
+            </button>
+            <button className="btn btn-circle" onClick={nextSlide}>
+              ❯
+            </button>
           </div>
-        </section>
-        <section className="bg-green-400 mb-10">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col items-center justify-between gap-8 md:flex-row p-5">
-              <div className="text-center md:text-left">
-                <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
-                  We Deliver your
-                  <br />
-                  Grocery in 24 Hours
-                </h2>
-                <button className="rounded-full bg-white px-8 py-3 text-lg font-semibold text-green-500 transition-transform hover:scale-105">
-                  Order Now
-                </button>
-              </div>
-              <div className="w-full max-w-md md:w-1/2">
+        </div>
+        <hr />
+        <BranchSection />
+        <section className="bg-orange-400 text-white py-10 mb-10">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              Download Our App and Shop on the Go!
+            </h2>
+            <p className="mb-6 text-lg">
+              Enjoy the best shopping experience directly from your mobile.
+              Download our app today and shop fresh produce and daily essentials
+              with ease!
+            </p>
+            <div className="flex justify-center space-x-4">
+              <a
+                href="https://play.google.com/store"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <img
-                  src="img.png"
-                  alt="Delivery Person on Scooter"
-                  className="w-full object-contain"
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Play_Store_logo_2015.png"
+                  alt="Google Play Store"
+                  className="w-32 h-auto"
                 />
-              </div>
+              </a>
+              <a
+                href="https://www.apple.com/app-store/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/1/1f/App_Store_%28iOS%29_logo.svg"
+                  alt="App Store"
+                  className="w-32 h-auto"
+                />
+              </a>
             </div>
           </div>
         </section>
       </main>
+
       <Footer />
     </div>
   );
