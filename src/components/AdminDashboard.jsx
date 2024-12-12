@@ -18,19 +18,16 @@ function AdminDashboard() {
         }
         const data = await response.json();
         const result = data.data;
-  
 
         const uniqueBranches = [...new Set(result.map((transaction) => transaction.branch_name))];
         setBranches(uniqueBranches);
-  
-  
+
         setTransactions(result);
-  
 
         const filteredData = selectedBranch
           ? result.filter((transaction) => transaction.branch_name === selectedBranch)
           : result;
-  
+
         const aggregatedData = filteredData.reduce((acc, transaction) => {
           const { product_name, quantity } = transaction;
           if (!acc[product_name]) {
@@ -39,22 +36,20 @@ function AdminDashboard() {
           acc[product_name].quantity += quantity;
           return acc;
         }, {});
-  
 
         const topSalesData = Object.values(aggregatedData)
-          .filter((sale) => sale.quantity > 0) 
+          .filter((sale) => sale.quantity > 0)
           .sort((a, b) => b.quantity - a.quantity)
           .slice(0, 20);
-  
+
         setTopSales(topSalesData);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
     };
-  
+
     fetchTransactions();
-  }, [selectedBranch]); 
-  
+  }, [selectedBranch]);
 
   const logout = () => {
     sessionStorage.clear();
@@ -103,32 +98,34 @@ function AdminDashboard() {
           {/* Transactions Table */}
           <div className="px-6 w-1/2">
             <h2 className="text-2xl font-bold mb-4">Transactions</h2>
-            <table className="min-w-full bg-white shadow-md rounded mb-4">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b text-left">Order ID</th>
-                  <th className="py-2 px-4 border-b text-left">Customer Name</th>
-                  <th className="py-2 px-4 border-b text-left">Product Name</th>
-                  <th className="py-2 px-4 border-b text-left">Quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.length > 0 ? (
-                  transactions.map((transaction) => (
-                    <tr key={transaction.id}>
-                      <td className="py-2 px-4 border-b">{transaction.id}</td>
-                      <td className="py-2 px-4 border-b">{transaction.customer_name}</td>
-                      <td className="py-2 px-4 border-b">{transaction.product_name}</td>
-                      <td className="py-2 px-4 border-b">{transaction.quantity}</td>
-                    </tr>
-                  ))
-                ) : (
+            <div className="overflow-y-auto max-h-96">
+              <table className="min-w-full bg-white shadow-md rounded mb-4">
+                <thead>
                   <tr>
-                    <td colSpan="4" className="text-center py-4">No transactions available</td>
+                    <th className="py-2 px-4 border-b text-left">Order ID</th>
+                    <th className="py-2 px-4 border-b text-left">Customer Name</th>
+                    <th className="py-2 px-4 border-b text-left">Product Name</th>
+                    <th className="py-2 px-4 border-b text-left">Quantity</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {transactions.length > 0 ? (
+                    transactions.map((transaction) => (
+                      <tr key={transaction.id}>
+                        <td className="py-2 px-4 border-b">{transaction.id}</td>
+                        <td className="py-2 px-4 border-b">{transaction.customer_name}</td>
+                        <td className="py-2 px-4 border-b">{transaction.product_name}</td>
+                        <td className="py-2 px-4 border-b">{transaction.quantity}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="text-center py-4">No transactions available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Top Sales Table */}
